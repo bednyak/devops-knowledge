@@ -1,0 +1,58 @@
+version: "3.7"
+services:
+
+  postgres-db:
+    image: postgres:latest
+    container_name: my-postgres-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    networks:
+      - my-network
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_DATABASE_PASSWORD}
+      POSTGRES_DB: test-db
+
+  mysql-db:
+    image: mysql:5.6
+    container_name: my-mysql-db
+    restart: unless-stopped
+    networks:
+      - my-network
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_DATABASE_ROOT_PASSWORD} # user is 'root'
+      MYSQL_DATABASE: test-db
+      MYSQL_USER: mysql
+      MYSQL_PASSWORD: ${MYSQL_DATABASE_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-db:/var/lib/mysql
+
+  mongo-db:
+    image: mongo:latest
+    container_name: my-mongo-db
+    restart: unless-stopped
+    networks:
+      - my-network
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-db:/data/db
+
+networks:
+  my-network:
+    name: my_network
+volumes:
+  postgres-db:
+    name: postgres_db
+  mysql-db:
+    name: mysql_db
+  mongo-db:
+    name: mongo_db
