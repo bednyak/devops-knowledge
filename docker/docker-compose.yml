@@ -16,6 +16,20 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_DATABASE_PASSWORD}
       POSTGRES_DB: test-db
 
+  maria-db:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MARIA_DB_DATABASE_ROOT_PASSWORD}
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: user
+      MYSQL_PASSWORD: ${MARIA_DB_DATABASE_PASSWORD}
+    volumes:
+      - maria-db:/var/lib/mysql
+    networks:
+      - my-network
+    ports:
+      - "3307:3307"
+
   mysql-db:
     image: mysql:5.6
     container_name: my-mysql-db
@@ -46,13 +60,68 @@ services:
     volumes:
       - mongo-db:/data/db
 
+  redis-stack-local:
+    image: redis/redis-stack-server:latest
+    container_name: my-redis-stack
+    restart: unless-stopped
+    #  credentials for connection - username: user; password: password
+    environment:
+      REDIS_ARGS: "redis-server --requirepass password --user user on >password ~* allcommands --user default off nopass nocommands"
+    volumes:
+      - redis:/data
+    networks:
+      - my-network
+    ports:
+      - '6379:6379'
+
+  redis:
+    image: redis:latest
+    container_name: my-redis-db
+    restart: unless-stopped
+    volumes:
+      - redis:/data
+    networks:
+      - my-network
+    ports:
+      - '6379:6379'
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: my-rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq/
+    networks:
+      - my-network
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
 networks:
   my-network:
     name: my_network
+    driver: local
 volumes:
   postgres-db:
     name: postgres_db
+    driver: local
   mysql-db:
     name: mysql_db
+    driver: local
   mongo-db:
     name: mongo_db
+    driver: local
+  redis-stack:
+    name: redis_stack
+    driver: local
+  maria-db:
+    name: maria_db
+    driver: local
+  redis:
+    name: redis_db
+    driver: local
+  rabbitmq:
+    name: rabbitmq_data
+    driver: local
