@@ -18,3 +18,17 @@ docker exec backend-db-preprod pg_restore -U postgres -d testdb /root/my_backup_
 psql -U postgresql_user test
 CREATE EXTENSION "uuid-ossp";
 ```
+- Enter into PostgreSQL terminal
+```
+sudo -i -u postgres
+```
+- Generate *.pem SSH key
+```
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com" -f ./id-key
+ssh-keygen -p -m PEM -f ./vertex-dev-key
+```
+- Find process by port number
+```
+sudo lsof -i :80 
+```
+

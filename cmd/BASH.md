@@ -1,6 +1,7 @@
 # Bash hints
 
 ## Commands
+
 - Replace a string with another string
 ```
 sed -i 's/old-word/new-word/g' *.txt

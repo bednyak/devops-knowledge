@@ -5,3 +5,7 @@
 ```
 sudo mysqldump -h localhost -u root --password="PMFHWLjWTCHszBdaeRb9F9Gt" dev > /var/db/backup_database.sql 
 ```
+- Enter to MySQL terminal as root
+```
+sudo mysql -u root
+```
