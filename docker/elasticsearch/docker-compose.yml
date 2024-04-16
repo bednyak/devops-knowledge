@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  setup:
+  esmaster:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
@@ -39,7 +39,7 @@ services:
       '
   esnode1:
     depends_on:
-      - setup
+      - esmaster
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
