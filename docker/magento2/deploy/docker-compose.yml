@@ -1,0 +1,118 @@
+version: '3.8'
+services:
+  magento2:
+    build:
+      context: ../
+      dockerfile: ./deploy/Dockerfile
+    container_name: mg2-local
+    restart: unless-stopped
+    environment:
+      BASE_URL: ${BASE_URL}
+      MYSQL_DB_HOST: ${MYSQL_DB_HOST}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_USER: ${MYSQL_ROOT_USER}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      ADMIN_FIRSTNAME: ${ADMIN_FIRSTNAME}
+      ADMIN_LASTNAME: ${ADMIN_LASTNAME}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_USER: ${ADMIN_USER}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      LANGUAGE: ${LANGUAGE}
+      CURRENCY: ${CURRENCY}
+      TIMEZONE: ${TIMEZONE}
+      SEARCH_ENGINE: ${SEARCH_ENGINE}
+      ELASTICSEARCH_PASSWORD: ${ELASTICSEARCH_PASSWORD}
+      ELASTICSEARCH_USERNAME: ${ELASTICSEARCH_USERNAME}
+      ELASTICSEARCH_ENABLE_AUTH: ${ELASTICSEARCH_ENABLE_AUTH}
+      ELASTICSEARCH_INDEX_PREFIX: ${ELASTICSEARCH_INDEX_PREFIX}
+      ELASTICSEARCH_PORT: ${ELASTICSEARCH_PORT}
+      ELASTICSEARCH_SERVER_HOSTNAME: ${ELASTICSEARCH_SERVER_HOSTNAME}
+    volumes:
+      - ../app/code/InfinityplNazeel:/var/www/magento2/app/code/InfinityplNazeel
+      - ../app/design/frontend/Nazeel:/var/www/magento2/app/design/frontend/Nazeel
+      - ../app/etc/config.php:/var/www/magento2/app/etc/config.php
+      - ../pub/media:/var/www/magento2/pub/media
+      - ../composer.json:/var/www/magento2/composer.json
+      - ../composer.lock:/var/www/magento2/composer.lock
+      - ./nginx_conf.conf:/etc/nginx/sites-available/default
+    networks:
+      - magento2-network
+    ports:
+      - 8080:8080
+
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db-local
+    restart: unless-stopped
+    networks:
+      - magento2-network
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} # user is 'root'
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-db:/var/lib/mysql
+
+  esmaster:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_STACK_VERSION}
+    networks:
+      - magento2-network
+    command: >
+      bash -c '
+        echo "Waiting for Elasticsearch availability";
+        until curl -s http://esnode1:9200 | grep -q "cluster_name"; do sleep 30; done;
+        echo "Good to go!";
+      '
+
+  esnode1:
+    depends_on:
+      - esmaster
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTICSEARCH_STACK_VERSION}
+    restart: unless-stopped
+    container_name: elasticsearch-node1-local
+    ports:
+      - ${ELASTICSEARCH_PORT}:9200
+    networks:
+      - magento2-network
+    volumes:
+      - esnode1-data:/usr/share/elasticsearch/data
+    environment:
+      - node.name=esnode1
+      - ELASTIC_PASSWORD=testtest # username: elastic
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Dxpack.security.authc.api_key.enabled=false" # Disable API key authentication
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  kibana:
+    depends_on:
+      - esnode1
+    image: docker.elastic.co/kibana/kibana:${ELASTICSEARCH_STACK_VERSION}
+    restart: unless-stopped
+    container_name: kibana-local
+    volumes:
+      - kibana-data:/usr/share/kibana/data
+    ports:
+      - ${KIBANA_PORT}:5601
+    networks:
+      - magento2-network
+    environment:
+      - SERVERNAME=kibana
+      - ELASTICSEARCH_HOSTS=http://esnode1:9200
+
+networks:
+  magento2-network:
+volumes:
+  mysql-db:
+    driver: local
+  esnode1-data:
+    driver: local
+  kibana-data:
+    driver: local
