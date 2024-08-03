@@ -47,13 +47,6 @@ sudo snap install postman
 ```
 sudo snap install robo3t-snap
 ```
-
-- Install Flameshot
-
-```
-sudo apt install flameshot
-```
-
 Go to /etc/gdm3/custom.conf
 
 ```
@@ -63,6 +56,12 @@ sudo nano /etc/gdm3/custom.conf
 Remove the comment on **#WaylandEnable=false**
 
 Save custom.conf file and restart your machine
+
+- Install Flameshot
+
+```
+sudo apt install flameshot
+```
 
 - Install NVM and NodeJS
 
