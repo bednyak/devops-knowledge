@@ -194,8 +194,9 @@ sudo nano $HOME/.profile
 
 Add the next row **export PATH=$PATH:/usr/local/go/bin** to the .profile
 Reboot you PC
-
+```
 go version
+```
 
 - Setup VPN connection
 
