@@ -5,11 +5,11 @@
 ```
 docker build -t [image_name] [dockerfile_location] --build-arg [ARG_KEY]=[ARG_VALUE] ---> example: docker build -t andrewbednyak/front:local . --build-arg VUE_APP_DEFAULT_HOST_BOT=http://localhost:4455 --build-arg VUE_APP_DEFAULT_HOST_MESSAGE_SERVICE=http://localhost:2222
 ```
-- run docker-compose services in the background mode
+- run docker compose services in the background mode
 ```
 docker-compose up --build [container_name_or_id]
 ```
-- stop all docker-compose services, delete all images and volumes
+- stop all docker compose services, delete all images and volumes
 ```
 docker-compose down --rmi all --volumes --remove-orphans
 ```
