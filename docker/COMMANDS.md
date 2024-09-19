@@ -173,3 +173,18 @@ docker run -d --name=[desired_container_name] -p [host_machine_port]:[container_
 ```
 docker service create --replica=[amount_of_replicas] [image_name] ---> example: docker service create --replica=100 nodejs
 ```
+
+- get list of all networks
+```
+docker network ls
+```
+
+- delete network by name
+```
+docker network rm my-network
+```
+
+- delete all custom networks which are not using by any of container
+```
+docker network prune 
+```
