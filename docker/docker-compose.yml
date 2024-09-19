@@ -102,7 +102,7 @@ services:
 networks:
   my-network:
     name: my_network
-    driver: local
+    driver: bridge
 volumes:
   postgres-db:
     name: postgres_db
