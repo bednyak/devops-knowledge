@@ -8,7 +8,7 @@ Download *.deb from official site and install
 ```
 sudo apt update
 sudo apt install git
-git config --global user.name "andrew.bednyak"
+git config --global user.name "andrii.biedniak"
 git config --global user.email "bednyak.ao@gmail.com"
 ```
 
